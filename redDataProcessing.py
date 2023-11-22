@@ -16,6 +16,7 @@ def save_bar_plot(missing_values, dataset_name, cleaning_status):
     plt.close()
     
 def main():
+
     selected_columns = ['gameId','gameDuraton', 'redWins', 'redFirstBlood', 'redFirstTower', 'redFirstBaron', 'redFirstDragon', 'redFirstInhibitor', 'redDragonKills', 
                         'redBaronKills', 'redTowerKills', 'redInhibitorKills', 'redWardPlaced', 'redWardkills', 'redKills', 'redAssist', 'redChampionDamageDealt', 
                         'redChampionDamageDealt', 'redChampionDamageDealt', 'redTotalGold', 'redTotalMinionKills', 'redTotalLevel', 'redAvgLevel', 'redJungleMinionKills', 

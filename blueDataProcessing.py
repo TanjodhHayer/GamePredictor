@@ -23,10 +23,10 @@ def main():
                         'blueKillingSpree', 'blueTotalHeal', 'blueObjectDamageDealt']  # Columns to keep
 
     # Load datasets with only 25,000 rows from each rank and select columns
+    
     challenger_data = pd.read_csv("datasets/Challenger_Ranked_Games.csv", usecols=selected_columns).sample(n=25000, random_state=42)
     grandmaster_data = pd.read_csv("datasets/GrandMaster_Ranked_Games.csv", usecols=selected_columns).sample(n=25000, random_state=42)
     master_data = pd.read_csv("datasets/Master_Ranked_Games.csv", usecols=selected_columns).sample(n=25000, random_state=42)
-
 
     # Display basic information about each dataset
     print("Challenger Data Before Cleaning:")
