@@ -18,48 +18,51 @@ def save_bar_plot(missing_values, dataset_name, cleaning_status):
     
 def main():
     
-    selected_columns = ['matchID', 'fullTimeMS', 'blueChampionKill', 'blueFirstBlood', 'blueDragonKill', 'blueRiftHeraldKill', 
-                        'blueTowerKill', 'blueTotalGold', 'blueMinionsKilled', 'blueJungleMinionsKilled', 'blueAvgPlayerLevel', 'blueWin'] # Columns to keep
+    selected_columns = ['matchID', 'fullTimeMS', 'blueChampionKill', 'blueFirstBlood', 'blueDragonKill', 
+                    'blueRiftHeraldKill', 'blueTowerKill', 'blueTotalGold', 'blueMinionsKilled', 
+                    'blueJungleMinionsKilled', 'blueAvgPlayerLevel', 'blueWin', 'redChampionKill', 
+                    'redFirstBlood', 'redDragonKill', 'redRiftHeraldKill', 'redTowerKill', 'redTotalGold', 
+                    'redMinionsKilled', 'redJungleMinionsKilled', 'redAvgPlayerLevel', 'redWin']
 
     # Load datasets with only 25,000 rows from each rank and select columns
     # https://zenodo.org/records/8303397 these datasets are from this site.
-    twentyData = pd.read_csv("datasets/timeBased/full_data_40.csv", usecols=selected_columns)
+    data = pd.read_csv("datasets/timeBased/full_data_40.csv", usecols=selected_columns)
     
 
     # Display basic information about each dataset
     print("Game data of 20% in Game:")
-    print(twentyData.info())
+    print(data.info())
 
 
 
     # Check for missing values in each dataset
-    missing_values_of_twenty = twentyData.isnull().sum()
+    missing_values_of_twenty = data.isnull().sum()
     save_bar_plot(missing_values_of_twenty, "Game Data", "Before")
 
     # Drop rows with missing values in each dataset
-    twentyData = twentyData.dropna()
+    data = data.dropna()
 
 
     # Check the number of rows after dropping missing values
-    num_rows_twentyData = len(twentyData)
+    num_rows_twentyData = len(data)
     
     
     print(num_rows_twentyData)
 
 
     
-    twentyData.to_csv("full_data_20_cleaned.csv", index=False)
+    data.to_csv("full_data_20_cleaned.csv", index=False)
 
     # Display basic information about the combined dataset
     print("\ Data After Cleaning:")
-    print(twentyData.info())
+    print(data.info())
 
     # Check for missing values after cleaning
-    missing_values_after = twentyData.isnull().sum()
+    missing_values_after = data.isnull().sum()
     save_bar_plot(missing_values_after, "Data", "After")
-    print(twentyData['fullTimeMS'].mean())
-    twentyData['fullTimeMinutes'] = twentyData['fullTimeMS'] / 60000
-    filtered_data = twentyData[(twentyData['fullTimeMinutes'] >= 25) & (twentyData['fullTimeMinutes'] <= 30)]
+    print(data['fullTimeMS'].mean())
+    data['fullTimeMinutes'] = data['fullTimeMS'] / 60000
+    filtered_data = data[(data['fullTimeMinutes'] >= 25) & (data['fullTimeMinutes'] <= 30)]
     filtered_data.to_csv("22-375minof40%.csv", index=False)
     print(len(filtered_data))
 
