@@ -11,7 +11,7 @@ os.makedirs(output_folder, exist_ok=True)
 def save_bar_plot(missing_values, dataset_name, cleaning_status):
     plt.figure(figsize=(8, 12))
     plt.bar(missing_values.index, missing_values)
-    plt.title(f"Missing Values in {dataset_name} Data {cleaning_status} Cleaning")
+    plt.title(f"Missing Values in {dataset_name}{cleaning_status} Cleaning")
     plt.xticks(rotation='vertical')  # Rotate x-axis labels
     plt.savefig(f"{output_folder}/blue{dataset_name.replace(' ', '')}{cleaning_status}.png")
     plt.close()
@@ -29,45 +29,38 @@ def main():
     data = pd.read_csv("datasets/timeBased/full_data_40.csv", usecols=selected_columns)
     
 
-    # Display basic information about each dataset
-    print("Game data of 20% in Game:")
-    print(data.info())
-
-
-
-    # Check for missing values in each dataset
+    # Check for missing values in the dataset
     missing_values_of_twenty = data.isnull().sum()
     save_bar_plot(missing_values_of_twenty, "Game Data", "Before")
 
     # Drop rows with missing values in each dataset
     data = data.dropna()
-
-
-    # Check the number of rows after dropping missing values
-    num_rows_twentyData = len(data)
-    
-    
-    print(num_rows_twentyData)
-
-
-    
-    data.to_csv("full_data_20_cleaned.csv", index=False)
-
-    # Display basic information about the combined dataset
-    print("\ Data After Cleaning:")
-    print(data.info())
+    data = data.drop_duplicates()
 
     # Check for missing values after cleaning
     missing_values_after = data.isnull().sum()
     save_bar_plot(missing_values_after, "Data", "After")
-    print(data['fullTimeMS'].mean())
-    data['fullTimeMinutes'] = data['fullTimeMS'] / 60000
-    filtered_data = data[(data['fullTimeMinutes'] >= 25) & (data['fullTimeMinutes'] <= 30)]
-    filtered_data.to_csv("22-375minof40%.csv", index=False)
-    print(len(filtered_data))
+    
+    #checking the average of about how long each game is
+    #print(data['fullTimeMS'].mean())
+    
+    
+    # adding a new column called fullTimeMin so the game duration is in mins instead of ms
+    data['fullTimeMin'] = data['fullTimeMS'] / 60000
+    data['fullTimeMin'] = data['fullTimeMin'].astype(float)
+
+    # Further filtering the dataset based on game duration
+    filtered_data = data[(data['fullTimeMin'] >= 25) & (data['fullTimeMin'] <= 30)]
+
+    # dropping the original 'fullTimeMS' column as its no longer needed
+    filtered_data = filtered_data.drop('fullTimeMS', axis=1)
 
     
-
+    filtered_data.to_csv("22-375minof40%.csv", index=False)
+    
+    #checking how much data remains about 16.2k games remaining
+    #print(len(filtered_data))
+    
 
 if __name__ == "__main__":
     main()
