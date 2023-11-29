@@ -1,8 +1,10 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import matplotlib.ticker as mtick
 import seaborn as sns
- # Load the dataset
+from statsmodels.nonparametric.smoothers_lowess import lowess
+# Load the dataset
 #data = pd.read_csv('datasets/timeBased/full_data_40.csv')
 data = pd.read_csv('22-375minof40%.csv')
 
@@ -69,8 +71,6 @@ def RedVsBlue():
 
 
 def ChampionKills():
-    data['ChampionKillsDiff'] = data['blueChampionKill'] - data['redChampionKill']
-
     # Champion Kills advantage binary feature (e.g., more blue champion kills)
     data['blueChampionAdv'] = (data['ChampionKillsDiff'] > 0).astype(int)
     champion_adv_win_rate = data[data['blueChampionAdv'] == 1]['blueWin'].mean() * 100
@@ -125,9 +125,6 @@ def ChampionKills():
     plt.savefig("ChampionKill_Difference_Thresholds_LinePlot_Subplots.png")
 
 def GoldDiff():
-    # Calculate the gold differences
-    data['GoldDiff'] = data['blueTotalGold'] - data['redTotalGold']
-
     # Define the thresholds (e.g., starting from 0 and increasing by 200 for both teams)
     thresholds = range(-7000, 9000, 600)
 
@@ -174,8 +171,6 @@ def GoldDiff():
 
 
 def DragonKills():
-    # Dragon Kills difference
-    data['DragonKillsDiff'] = data['blueDragonKill'] - data['redDragonKill']
     # Define the thresholds
     thresholds = [0, 1]
 
@@ -209,6 +204,7 @@ def DragonKills():
 
 def Towerkills():
     data['TowerKillsDiff'] = data['blueTowerKill'] - data['redTowerKill']
+    
     thresholds = range(0, 3, 1)
 
     # Create subplots
@@ -253,6 +249,116 @@ def Towerkills():
     plt.tight_layout(rect=[0, 0, 1, 0.96])
     plt.savefig("TowerKill_Difference_Thresholds_LinePlot_Subplots.png")
 
+def minionsKilledTotal():
+    # Calculate win rate for each value of blueMinionsKilledTotal
+    blue_minions_data_for_line_plot = (
+        data.groupby('blueMinionsKilledTotal')['blueWin']
+        .mean()
+        .reset_index()
+        .rename(columns={'blueMinionsKilledTotal': 'MinionsKilledTotal', 'blueWin': 'WinRate'})
+    )
+
+    # Smooth the data using lowess
+    smoothed_values = lowess(blue_minions_data_for_line_plot['WinRate'], blue_minions_data_for_line_plot['MinionsKilledTotal'], frac=0.1)[:, 1] * 100
+    blue_minions_data_for_line_plot_smoothed = pd.DataFrame({'MinionsKilledTotal': blue_minions_data_for_line_plot['MinionsKilledTotal'], 'SmoothedWinRate': smoothed_values})
+
+    # Plot for blue team
+    plt.figure(figsize=(12, 9))
+    plt.subplot(3, 1, 1)
+    sns.lineplot(x='MinionsKilledTotal', y='SmoothedWinRate', data=blue_minions_data_for_line_plot_smoothed, color='green')
+    plt.title('Blue Team Win Rate based on Minions Killed Total', fontsize=16)
+    plt.xlabel('Minions Killed Total', fontsize=14)
+    plt.ylabel('Blue Team Win Rate (%)', fontsize=14)
+    plt.xticks(fontsize=12)
+    plt.yticks(fontsize=12)
+    plt.grid(True)
+
+    # Calculate win rate for each value of redMinionsKilledTotal
+    red_minions_data_for_line_plot = (
+        data.groupby('redMinionsKilledTotal')['redWin']
+        .mean()
+        .reset_index()
+        .rename(columns={'redMinionsKilledTotal': 'MinionsKilledTotal', 'redWin': 'WinRate'})
+    )
+
+    # Smooth the data using lowess
+    smoothed_values_red = lowess(red_minions_data_for_line_plot['WinRate'], red_minions_data_for_line_plot['MinionsKilledTotal'], frac=0.1)[:, 1]* 100
+    red_minions_data_for_line_plot_smoothed = pd.DataFrame({'MinionsKilledTotal': red_minions_data_for_line_plot['MinionsKilledTotal'], 'SmoothedWinRate': smoothed_values_red})
+
+    # Plot for red team
+    plt.subplot(3, 1, 2)
+    sns.lineplot(x='MinionsKilledTotal', y='SmoothedWinRate', data=red_minions_data_for_line_plot_smoothed, color='red')
+    plt.title('Red Team Win Rate based on Minions Killed Total', fontsize=16)
+    plt.xlabel('Minions Killed Total', fontsize=14)
+    plt.ylabel('Red Team Win Rate (%)', fontsize=14)
+    plt.xticks(fontsize=12)
+    plt.yticks(fontsize=12)
+    plt.grid(True)
+
+    # Calculate win rate for each difference value
+    minions_diff_data_for_line_plot = (
+        data.groupby('MinionsKilledDiff')['blueWin']
+        .mean()
+        .reset_index()
+        .rename(columns={'blueWin': 'WinRateDiff'})
+    )
+
+    smoothed_values_diff = lowess(minions_diff_data_for_line_plot['WinRateDiff'], minions_diff_data_for_line_plot['MinionsKilledDiff'], frac=0.1)[:, 1]* 100
+    minions_diff_data_for_line_plot_smoothed = pd.DataFrame({'MinionsKilledDiff': minions_diff_data_for_line_plot['MinionsKilledDiff'], 'SmoothedWinRate': smoothed_values_diff})
+
+    # Plot the difference
+    plt.subplot(3, 1, 3)
+    sns.lineplot(x='MinionsKilledDiff', y='SmoothedWinRate', data=minions_diff_data_for_line_plot_smoothed, color='orange')
+    plt.title('Blue Team Win Rate based on Minions Killed Difference (Blue - Red)', fontsize=16)
+    plt.xlabel('Minions Killed Difference', fontsize=14)
+    plt.ylabel('Blue Team Win Rate (%)', fontsize=14)
+    plt.xticks(fontsize=12)
+    plt.yticks(fontsize=12)
+    plt.grid(True)
+
+    # Adjust layout and save the plot
+    plt.tight_layout(rect=[0, 0, 1, 0.96])
+    plt.savefig("MinionsKilledTotal_WinRate_LinePlot_Subplots_Smoothed.png")
+
+    
+
+
+def dragonImpactOnWinRate():
+    # Assuming 'data' is your DataFrame
+
+    # Filter data for games where blue team got exactly one dragon
+    one_dragon_condition = (data['blueDragonKill'] == 1) & (data['redDragonKill'] == 0)
+    one_dragon_data = data[one_dragon_condition]
+
+    # Calculate win rate for each gold difference
+    win_rates = []
+
+    # Define the gold difference values you want to use for the x-axis
+    gold_diff_values = range(0, one_dragon_data['GoldDiff'].max() + 1)
+
+    # Calculate win rate for each gold difference
+    for value in gold_diff_values:
+        condition = one_dragon_data['GoldDiff'] == value
+        win_rate = one_dragon_data[condition]['blueWin'].mean() * 100
+        win_rates.append(win_rate)
+
+    # Create a DataFrame for plotting
+    dragon_gold_data_for_line_plot = pd.DataFrame({'GoldDiff': gold_diff_values, 'WinRate': win_rates})
+
+    # Plot the data with legend and different colors
+    plt.figure(figsize=(26, 8))
+    sns.lineplot(x='GoldDiff', y='WinRate', marker='o', data=dragon_gold_data_for_line_plot, label='One Dragon', color='blue')
+    plt.title('Blue Team Win Rate based on Gold Difference with One Dragon', fontsize=16)
+    plt.xlabel('Gold Difference', fontsize=14)
+    plt.ylabel('Blue Team Win Rate (%)', fontsize=14)
+    plt.xticks(fontsize=12)
+    plt.yticks(fontsize=12)
+    plt.legend(fontsize=12)
+    plt.grid(True)
+
+    # Adjust layout and save the plot
+    plt.tight_layout(rect=[0, 0, 1, 0.96])
+    plt.savefig("DragonImpactOnWinRate_LinePlot.png")
 
 
 def main():
@@ -267,14 +373,15 @@ def main():
     print(f"Blue Win Rate: {blue_win_rate:.2f}%")
     print(f"Red Win Rate: {red_win_rate:.2f}%")
 
-
+    minionsKilledTotal()
     DragonKills()
     GoldDiff()
     ChampionKills()
     Towerkills()
     RedVsBlue()
-
-
+    
+    # may have to remove this if we cant get it cleaned enough
+    dragonImpactOnWinRate()
 
 
 if __name__ == "__main__":

@@ -48,7 +48,19 @@ def main():
     # adding a new column called fullTimeMin so the game duration is in mins instead of ms
     data['fullTimeMin'] = data['fullTimeMS'] / 60000
     data['fullTimeMin'] = data['fullTimeMin'].astype(float)
-
+    
+    # adding new columns to find differences
+    data['GoldDiff'] = data['blueTotalGold'] - data['redTotalGold']
+    data['ChampionKillsDiff'] = data['blueChampionKill'] - data['redChampionKill']
+    data['DragonKillsDiff'] = data['blueDragonKill'] - data['redDragonKill']
+    
+    # adding new column to find total minions killed
+    data['blueMinionsKilledTotal'] = data['blueMinionsKilled'] + data['blueJungleMinionsKilled']
+    data['redMinionsKilledTotal'] = data['redMinionsKilled'] + data['redJungleMinionsKilled']
+    
+    # new column checks difference between blue total minons killed and red total minion killed
+    data['MinionsKilledDiff'] = data['blueMinionsKilledTotal'] - data['redMinionsKilledTotal']
+    
     # Further filtering the dataset based on game duration
     filtered_data = data[(data['fullTimeMin'] >= 25) & (data['fullTimeMin'] <= 30)]
 
