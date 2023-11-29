@@ -202,52 +202,7 @@ def DragonKills():
 
 
 
-def Towerkills():
-    data['TowerKillsDiff'] = data['blueTowerKill'] - data['redTowerKill']
-    
-    thresholds = range(0, 3, 1)
 
-    # Create subplots
-    fig, axes = plt.subplots(2, 1, figsize=(12, 12))
-
-    # Initialize lists to store win rates and corresponding thresholds for both blue and red teams
-    blue_win_rates = []
-    red_win_rates = []
-    tower_kill_diffs = []
-
-    # Calculate win rates and tower kill differences for each threshold
-    for threshold in thresholds:
-        blue_condition = data['blueTowerKill'] > threshold
-        red_condition = data['redTowerKill'] > threshold
-        blue_win_rate = data[blue_condition]['blueWin'].mean() * 100
-        red_win_rate = data[red_condition]['redWin'].mean() * 100
-        blue_win_rates.append(blue_win_rate)
-        red_win_rates.append(red_win_rate)
-        tower_kill_diffs.append(threshold)
-
-    # Create DataFrames from the lists
-    blue_data_for_line_plot = pd.DataFrame({'TowerKillDiff': tower_kill_diffs, 'BlueWinRate': blue_win_rates})
-    red_data_for_line_plot = pd.DataFrame({'TowerKillDiff': tower_kill_diffs, 'RedWinRate': red_win_rates})
-
-    # Line plot for blue team
-    sns.lineplot(x='TowerKillDiff', y='BlueWinRate', marker='o', data=blue_data_for_line_plot, color='blue', ax=axes[0])
-    axes[0].set_title('Blue Team Win Rates based on Tower Kills Difference Thresholds', fontsize=16)
-    axes[0].set_xlabel('Tower Kills Difference Threshold', fontsize=14)
-    axes[0].set_ylabel('Blue Team Win Rate (%)', fontsize=14)
-    axes[0].tick_params(axis='x')
-    axes[0].tick_params(axis='both', labelsize=12)
-
-    # Line plot for red team
-    sns.lineplot(x='TowerKillDiff', y='RedWinRate', marker='o', data=red_data_for_line_plot, color='red', ax=axes[1])
-    axes[1].set_title('Red Team Win Rates based on Tower Kills Difference Thresholds', fontsize=16)
-    axes[1].set_xlabel('Tower Kills Difference Threshold', fontsize=14)
-    axes[1].set_ylabel('Red Team Win Rate (%)', fontsize=14)
-    axes[1].tick_params(axis='x')
-    axes[1].tick_params(axis='both', labelsize=12)
-
-    # Adjust layout and save the plot
-    plt.tight_layout(rect=[0, 0, 1, 0.96])
-    plt.savefig("TowerKill_Difference_Thresholds_LinePlot_Subplots.png")
 
 def minionsKilledTotal():
     # Calculate win rate for each value of blueMinionsKilledTotal
@@ -323,42 +278,6 @@ def minionsKilledTotal():
     
 
 
-def dragonImpactOnWinRate():
-    # Assuming 'data' is your DataFrame
-
-    # Filter data for games where blue team got exactly one dragon
-    one_dragon_condition = (data['blueDragonKill'] == 1) & (data['redDragonKill'] == 0)
-    one_dragon_data = data[one_dragon_condition]
-
-    # Calculate win rate for each gold difference
-    win_rates = []
-
-    # Define the gold difference values you want to use for the x-axis
-    gold_diff_values = range(0, one_dragon_data['GoldDiff'].max() + 1)
-
-    # Calculate win rate for each gold difference
-    for value in gold_diff_values:
-        condition = one_dragon_data['GoldDiff'] == value
-        win_rate = one_dragon_data[condition]['blueWin'].mean() * 100
-        win_rates.append(win_rate)
-
-    # Create a DataFrame for plotting
-    dragon_gold_data_for_line_plot = pd.DataFrame({'GoldDiff': gold_diff_values, 'WinRate': win_rates})
-
-    # Plot the data with legend and different colors
-    plt.figure(figsize=(26, 8))
-    sns.lineplot(x='GoldDiff', y='WinRate', marker='o', data=dragon_gold_data_for_line_plot, label='One Dragon', color='blue')
-    plt.title('Blue Team Win Rate based on Gold Difference with One Dragon', fontsize=16)
-    plt.xlabel('Gold Difference', fontsize=14)
-    plt.ylabel('Blue Team Win Rate (%)', fontsize=14)
-    plt.xticks(fontsize=12)
-    plt.yticks(fontsize=12)
-    plt.legend(fontsize=12)
-    plt.grid(True)
-
-    # Adjust layout and save the plot
-    plt.tight_layout(rect=[0, 0, 1, 0.96])
-    plt.savefig("DragonImpactOnWinRate_LinePlot.png")
 
 
 def main():
@@ -377,11 +296,7 @@ def main():
     DragonKills()
     GoldDiff()
     ChampionKills()
-    Towerkills()
     RedVsBlue()
-    
-    # may have to remove this if we cant get it cleaned enough
-    dragonImpactOnWinRate()
 
 
 if __name__ == "__main__":
