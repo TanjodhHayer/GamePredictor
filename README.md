@@ -22,20 +22,14 @@
 ## Analysis and Visualization
 The analysis includes:
 
-- Game Duration Analysis
-- Team Performance Metrics
-- Minions Killed Analysis
-- Smoothed Win Rates
-- Team Comparison: Blue vs. Red
 - Total Gold Distribution
 - Kills and Gold Relationships
 - Game Duration Analysis
 - Impact of Champion Kills on Win Rates
 - Impact of Gold Differentials on Win Rates
 - Impact of Dragon Kills on Win Rates
-- Impact of Tower Kills on Win Rates
-- Minions Killed Analysis
-- Impact of Dragon and Gold Difference on Win Rate -- may be removing
+- Minions Killed Analysis Win Rates smoothed and unsmoothed
+
 
 ## Training and Modeling (Yet to be Implemented)
 The project will include a training and modeling aspect to enhance predictive capabilities. This will involve the use of statistical modeling and machine learning techniques.
