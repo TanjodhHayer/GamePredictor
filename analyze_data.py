@@ -5,19 +5,43 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as mtick
 import seaborn as sns
 from statsmodels.nonparametric.smoothers_lowess import lowess
+import altair as alt
 # Load the dataset
 #data = pd.read_csv('datasets/timeBased/full_data_40.csv')
 data = pd.read_csv('22-375minof40%.csv')
 
 # plots of red team vs blue team
 def RedVsBlue():
-    # Histogram Count for 'blueTotalGold' and 'redTotalGold'
     
-    plt.figure(figsize=(16, 8))
-    gs = gridspec.GridSpec(2, 2, width_ratios=[2, 2], height_ratios=[2, 2])
+    # Define the thresholds (e.g., starting from 0 and increasing by 200 for both teams)
+    thresholds = range(-7000, 9000, 600)
+
+    # Initialize lists to store win rates and corresponding thresholds for both blue and red teams
+    blue_win_rates = []
+    red_win_rates = []
+    gold_diffs = []
+
+    # Calculate win rates and gold differences for each threshold
+    for threshold in thresholds:
+        blue_condition = data['GoldDiff'] > threshold
+        red_condition = data['GoldDiff'] < -threshold  # Considering negative gold differences for the red team
+        blue_win_rate = data[blue_condition]['blueWin'].mean() * 100
+        red_win_rate = data[red_condition]['redWin'].mean() * 100
+        blue_win_rates.append(blue_win_rate)
+        red_win_rates.append(red_win_rate)
+        gold_diffs.append(threshold)
+
+    # Create DataFrames from the lists
+    blue_data_for_line_plot = pd.DataFrame({'GoldDiff': gold_diffs, 'BlueWinRate': blue_win_rates})
+    red_data_for_line_plot = pd.DataFrame({'GoldDiff': gold_diffs, 'RedWinRate': red_win_rates})
+
+
+        # Histogram Count for 'blueTotalGold' and 'redTotalGold'
+    plt.figure(figsize=(16, 12))
+    gs = gridspec.GridSpec(3, 2, width_ratios=[2, 2], height_ratios=[2, 2, 2])
 
     # Subplot for 'blueTotalGold'
-    plt.subplot(gs[0])
+    plt.subplot(gs[0, 0])
     plt.hist(x=data['blueTotalGold'], bins=80, color='skyblue', edgecolor='black')
     plt.yticks(fontsize=14)
     plt.xticks(fontsize=14)
@@ -26,24 +50,44 @@ def RedVsBlue():
     plt.title('Histogram of Blue Total Gold @ 10 - 12mins', fontsize=16, fontweight='bold')
 
     # Subplot for 'redTotalGold'
-    plt.subplot(gs[1])
+    plt.subplot(gs[0, 1])
     plt.hist(x=data['redTotalGold'], bins=80, color='lightcoral', edgecolor='black')
     plt.yticks(fontsize=14)
     plt.xticks(fontsize=14)
     plt.xlabel('Red Total Gold @ 10 - 12mins', fontsize=14)
     plt.ylabel('Count of Games', fontsize=14)
     plt.title('Histogram of Red Total Gold @ 10 - 12mins', fontsize=16, fontweight='bold')
-    
+
     # Scatter plot for Gold
-    plt.subplot(gs[2:])
+    plt.subplot(gs[1, :])
     sns.set_palette("deep")
     sns.scatterplot(x='blueTotalGold', y='redTotalGold', hue='blueWin', data=data, size='blueWin', sizes=[50, 150])
     plt.title('Blue vs. Red in Gold @ 10 - 12mins', fontsize=18, fontweight='bold')
     plt.xlabel('Blue Team Total Gold', fontsize=16)
     plt.ylabel('Red Team Total Gold', fontsize=16)
     plt.legend(title='Team', title_fontsize='12', loc='upper right', labels=['Blue', 'Red'])
-    plt.tight_layout()  # Adjust layout to prevent overlapping
-    plt.savefig('BlueVsRedGold.png')
+
+    # Line plot for blue team
+    plt.subplot(gs[2, 0])
+    sns.lineplot(x='GoldDiff', y='BlueWinRate', marker='o', data=blue_data_for_line_plot, color='blue')
+    plt.title('Blue Team Win Rates based on Gold Difference', fontsize=16)
+    plt.xlabel('Gold Difference', fontsize=14)
+    plt.ylabel('Blue Team Win Rate (%)', fontsize=14)
+    plt.xticks(rotation=90)
+    plt.tick_params(axis='both', labelsize=12)
+
+    # Line plot for red team
+    plt.subplot(gs[2, 1])
+    sns.lineplot(x='GoldDiff', y='RedWinRate', marker='o', data=red_data_for_line_plot, color='red')
+    plt.title('Red Team Win Rates based on Gold Difference', fontsize=16)
+    plt.xlabel('Gold Difference', fontsize=14)
+    plt.ylabel('Red Team Win Rate (%)', fontsize=14)
+    plt.xticks(rotation=90)
+    plt.tick_params(axis='both', labelsize=12)
+
+    # Adjust layout and save the plot
+    plt.tight_layout(rect=[0, 0, 1, 0.96])
+    plt.savefig("RedVsBlue_Gold_Difference.png")
     
 
 
@@ -124,50 +168,8 @@ def ChampionKills():
     plt.tight_layout(rect=[0, 0, 1, 0.96])
     plt.savefig("ChampionKill_Difference_Thresholds_LinePlot_Subplots.png")
 
-def GoldDiff():
-    # Define the thresholds (e.g., starting from 0 and increasing by 200 for both teams)
-    thresholds = range(-7000, 9000, 600)
 
-    # Initialize lists to store win rates and corresponding thresholds for both blue and red teams
-    blue_win_rates = []
-    red_win_rates = []
-    gold_diffs = []
-
-    # Calculate win rates and gold differences for each threshold
-    for threshold in thresholds:
-        blue_condition = data['GoldDiff'] > threshold
-        red_condition = data['GoldDiff'] < -threshold  # Considering negative gold differences for the red team
-        blue_win_rate = data[blue_condition]['blueWin'].mean() * 100
-        red_win_rate = data[red_condition]['redWin'].mean() * 100
-        blue_win_rates.append(blue_win_rate)
-        red_win_rates.append(red_win_rate)
-        gold_diffs.append(threshold)
-
-    # Create DataFrames from the lists
-    blue_data_for_line_plot = pd.DataFrame({'GoldDiff': gold_diffs, 'BlueWinRate': blue_win_rates})
-    red_data_for_line_plot = pd.DataFrame({'GoldDiff': gold_diffs, 'RedWinRate': red_win_rates})
-
-    # Create subplots
-    fig, axes = plt.subplots(2, 1, figsize=(12, 12))
-
-    # Line plot for blue team
-    sns.lineplot(x='GoldDiff', y='BlueWinRate', marker='o', data=blue_data_for_line_plot, color='blue', ax=axes[0])
-    axes[0].set_title('Blue Team Win Rates based on Gold Difference', fontsize=16)
-    axes[0].set_xlabel('Gold Difference', fontsize=14)
-    axes[0].set_ylabel('Blue Team Win Rate (%)', fontsize=14)
-    axes[0].tick_params(axis='x', rotation=90)
-    axes[0].tick_params(axis='both', labelsize=12)
-
-    # Line plot for red team
-    sns.lineplot(x='GoldDiff', y='RedWinRate', marker='o', data=red_data_for_line_plot, color='red', ax=axes[1])
-    axes[1].set_title('Red Team Win Rates based on Gold Difference', fontsize=16)
-    axes[1].set_xlabel('Gold Difference', fontsize=14)
-    axes[1].set_ylabel('Red Team Win Rate (%)', fontsize=14)
-    axes[1].tick_params(axis='x', rotation=90)
-    axes[1].tick_params(axis='both', labelsize=12)
-    # Adjust layout and save the plot
-    plt.tight_layout(rect=[0, 0, 1, 0.96])
-    plt.savefig("Gold_Difference_Thresholds_LinePlot_Subplots.png")
+    
 
 
 def DragonKills():
@@ -179,6 +181,7 @@ def DragonKills():
 
     # Bar plot for Blue Team Win Rate based on Dragon Kills Thresholds
     win_rates = [data[data['blueDragonKill'] > threshold]['blueWin'].mean() * 100 for threshold in thresholds]
+    print(win_rates)
     axes[0].bar(thresholds, win_rates, color='darkgreen', alpha=0.7)
     axes[0].set_title('Blue Team Win Rate based on Dragon Kills', fontsize=16)
     axes[0].set_xlabel('Dragon Kills Threshold', fontsize=14)
@@ -186,18 +189,41 @@ def DragonKills():
     axes[0].set_xticks(thresholds)
     axes[0].tick_params(axis='both', labelsize=12)
 
-    # Count Plot for 'blueDragonKill' and 'redDragonKill'
-    colors = sns.color_palette("pastel")[:2]  # Limiting to two distinct colors
-    sns.countplot(x='blueDragonKill', hue='redDragonKill', data=data, palette=colors, ax=axes[1])
-    axes[1].set_xlabel('Dragon Kills @ 10 - 12mins', fontsize=14, fontweight='bold')
-    axes[1].set_ylabel('Count of Games', fontsize=14, fontweight='bold')
-    axes[1].set_title('Dragon Kills by Blue and Red Teams @ 10 - 12mins', fontsize=16, fontweight='bold')
-    axes[1].legend(title='Team', title_fontsize='12', loc='upper right', labels=['Blue', 'Red'])
-    axes[1].tick_params(axis='both', labelsize=12)
+    # Altair Plot
+    chart = alt.Chart(data).mark_bar().encode(
+        x=alt.X('DragonKillsDiff:Q', scale=alt.Scale(domain=[-2, 2])),
+        y=alt.Y('count()'),
+        tooltip='count()'
+    )
 
-    # Adjust layout and save the plot
+    condition_1 = chart.transform_filter(
+        alt.datum.DragonKillsDiff < 0
+    ).encode(
+        color=alt.value('red')
+    )
+
+    condition_2 = chart.transform_filter(
+        alt.datum.DragonKillsDiff > 0
+    ).encode(
+        color=alt.value('blue')
+    )
+
+    condition_else = chart.transform_filter(
+        alt.datum.DragonKillsDiff == 0
+    ).encode(
+        color=alt.value('gray')
+    )
+
+    combined_chart = (condition_1 + condition_2 + condition_else)
+
+    # Save both plots side by side
+    plt.savefig("Combined_Plots.png")
+    
+    # Save Altair plot
+    combined_chart.save('Combined_Plots.png', scale_factor=1.0)
+
+    # Adjust layout and show the plot
     plt.tight_layout(rect=[0, 0, 1, 0.96])
-    plt.savefig("Dragon_Kills_Subplots.png")
 
 
 
@@ -346,7 +372,6 @@ def main():
 
     minionsKilledTotal()
     DragonKills()
-    GoldDiff()
     ChampionKills()
     RedVsBlue()
 
