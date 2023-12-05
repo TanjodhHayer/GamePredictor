@@ -33,8 +33,15 @@ The analysis includes:
 - Minions Killed Analysis Win Rates smoothed and unsmoothed
 
 
-## Training and Modeling (Yet to be Implemented)
-The project will include a training and modeling aspect to enhance predictive capabilities. This will involve the use of statistical modeling and machine learning techniques.
+## Training and Modeling
+  **Model Training:**
+   - Utilizing the Logistic Regression model for training on a subset of the dataset (75% of the data) using the Scikit-Learn library.
+ **Model Evaluation:**
+   - Assessing the model's performance on a separate test set (25% of the data), yielding an accuracy of 76%.
+   - Evaluation Metrics: Computation of precision, recall, and F1-score to provide a comprehensive understanding of the model's performance.
+ **Comparison with Alternative Models:**
+   - Verifying the robustness of the chosen Logistic Regression model through comparison with alternative models such as K-Nearest Neighbors (KNN) and Random Forest.
+
 
 ## Usage
 1. Clone the repository to your local machine.
