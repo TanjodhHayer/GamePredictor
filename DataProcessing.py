@@ -2,19 +2,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-import os
 
-
-output_folder = "TimeBasedChecks"
-os.makedirs(output_folder, exist_ok=True)
-
-def save_bar_plot(missing_values, dataset_name, cleaning_status):
-    plt.figure(figsize=(8, 12))
-    plt.bar(missing_values.index, missing_values)
-    plt.title(f"Missing Values in {dataset_name}{cleaning_status} Cleaning")
-    plt.xticks(rotation='vertical')  # Rotate x-axis labels
-    plt.savefig(f"{output_folder}/blue{dataset_name.replace(' ', '')}{cleaning_status}.png")
-    plt.close()
     
 def main():
     
@@ -31,18 +19,12 @@ def main():
 
     # Check for missing values in the dataset
     missing_values_of_twenty = data.isnull().sum()
-    save_bar_plot(missing_values_of_twenty, "Game Data", "Before")
+    print(missing_values_of_twenty, "Game Data")
 
     # Drop rows with missing values in each dataset
     data = data.dropna()
     data = data.drop_duplicates()
-
-    # Check for missing values after cleaning
-    missing_values_after = data.isnull().sum()
-    save_bar_plot(missing_values_after, "Data", "After")
     
-    #checking the average of about how long each game is
-    #print(data['fullTimeMS'].mean())
     
     
     # adding a new column called fullTimeMin so the game duration is in mins instead of ms

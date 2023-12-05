@@ -67,34 +67,40 @@ y_probs = logistic_regression_model.predict_proba(X_test)[:, 1]
 fpr, tpr, thresholds = roc_curve(y_test, y_probs)
 roc_auc = auc(fpr, tpr)
 
-plt.figure(figsize=(8, 6))
+# Plot Precision-Recall curve
+precision, recall, _ = precision_recall_curve(y_test, y_probs)
+
+# Plot Accuracy vs. Threshold
+thresholds = np.linspace(0, 1, 100)
+accuracies = [accuracy_score(y_test, y_probs >= thr) for thr in thresholds]
+
+plt.figure(figsize=(18, 6))
+
+# Plot ROC Curve
+plt.subplot(1, 3, 1)
 plt.plot(fpr, tpr, color='darkorange', lw=2, label=f'AUC = {roc_auc:.2f}')
 plt.plot([0, 1], [0, 1], color='navy', lw=2, linestyle='--')
 plt.xlabel('False Positive Rate')
 plt.ylabel('True Positive Rate')
 plt.title('ROC Curve')
 plt.legend(loc="lower right")
-plt.savefig(os.path.join(output_folder, 'ROC Curve.png'))
 
-# Plot Precision-Recall curve
-precision, recall, _ = precision_recall_curve(y_test, y_probs)
-
-plt.figure(figsize=(8, 6))
+# Plot Precision-Recall Curve
+plt.subplot(1, 3, 2)
 plt.plot(recall, precision, color='green', lw=2, label='Precision-Recall curve')
 plt.xlabel('Recall')
 plt.ylabel('Precision')
 plt.title('Precision-Recall Curve')
 plt.legend(loc="lower right")
-plt.savefig(os.path.join(output_folder, 'Precision-Recall Curve.png'))
 
-# Plot Accuracy
-thresholds = np.linspace(0, 1, 100)
-accuracies = [accuracy_score(y_test, y_probs >= thr) for thr in thresholds]
-
-plt.figure(figsize=(8, 6))
+# Plot Accuracy vs. Threshold
+plt.subplot(1, 3, 3)
 plt.plot(thresholds, accuracies, color='purple', lw=2, label='Accuracy')
 plt.xlabel('Threshold')
 plt.ylabel('Accuracy')
 plt.title('Accuracy vs. Threshold')
 plt.legend(loc="lower right")
-plt.savefig(os.path.join(output_folder, 'Accuracy vs. Threshold.png'))
+
+# Save the combined plot
+plt.tight_layout(rect=[0, 0, 1, 0.96])
+plt.savefig(os.path.join(output_folder, 'Combined_Plots.png'))

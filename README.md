@@ -6,6 +6,8 @@
 * pip3 install matplotlib
 * pip3 install seaborn
 * pip3 install statsmodels
+* pip3 install vl-convert-python
+* pip3 install altair vega_datasets
 
 ## Data Processing
 -  Loading datasets with 65k games and selected columns.
@@ -37,7 +39,7 @@ The project will include a training and modeling aspect to enhance predictive ca
 ## Usage
 1. Clone the repository to your local machine.
 2. Install the required Python libraries using the provided commands.
-3. Run the project python scripts
+3. Run the project python scripts DataProcessing.py --> analyze_data.py and then either models, order doesn't matter
 
 ## Contributors
 - Tanjodh Hayer
