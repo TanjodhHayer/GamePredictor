@@ -34,12 +34,14 @@ The analysis includes:
 
 
 ## Training and Modeling
-  **Model Training:**
+**Model Training:**
    - Utilizing the Logistic Regression model for training on a subset of the dataset (75% of the data) using the Scikit-Learn library.
- **Model Evaluation:**
+
+**Model Evaluation:**
    - Assessing the model's performance on a separate test set (25% of the data), yielding an accuracy of 76%.
    - Evaluation Metrics: Computation of precision, recall, and F1-score to provide a comprehensive understanding of the model's performance.
- **Comparison with Alternative Models:**
+   - 
+**Comparison with Alternative Models:**
    - Verifying the robustness of the chosen Logistic Regression model through comparison with alternative models such as K-Nearest Neighbors (KNN) and Random Forest.
 
 
